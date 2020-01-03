@@ -1,4 +1,4 @@
-import Recat from 'react';
+import React from 'react';
 
 import UserDetail from '../../components/userdetail/userdetail.component'
 
@@ -10,8 +10,10 @@ class UsersPage extends React.Component{
         }
     }
 
-    componentDidMount(){
-        fetch().then().catch()
+    async componentDidMount(){
+        let data = await fetch("http://localhost:3000/users", {headers: {'Authorization': 'Bearer '+this.props.token}})
+        data=data.json()
+        this.setState({data: data})
     }
 
     render(){
