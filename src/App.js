@@ -11,11 +11,18 @@ class  App extends React.Component {
     this.handleLogInButton = this.handleLogInButton.bind(this);
     this.handleLogOutButton = this.handleLogOutButton.bind(this);
     this.handleSignUpButton = this.handleSignUpButton.bind(this);
+    this.setToken = this.setToken.bind(this);
     this.state = {
       isLoginPage: true,
       isRegisterPage: false,
-      isUsersPage: false
+      isUsersPage: false,
+      token: ''
     }
+  }
+
+  setToken(token){
+    console.log(token)
+    this.setState({token: token});
   }
 
   handleLogInButton(){
@@ -37,7 +44,8 @@ class  App extends React.Component {
     this.setState({
       isLoginPage: true,
       isRegisterPage: false,
-      isUsersPage: false
+      isUsersPage: false,
+      token: null
     })
   }
 
@@ -62,7 +70,7 @@ class  App extends React.Component {
           LogOut
         </button>
       }{isLoginPage &&
-        <Login></Login>
+        <Login setToken={this.setToken}></Login>
       }{isRegisterPage &&
         <div><Signup></Signup></div>
       }{isUsersPage &&

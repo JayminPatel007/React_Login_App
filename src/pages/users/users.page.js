@@ -12,7 +12,7 @@ class UsersPage extends React.Component{
 
     async componentDidMount(){
         let data = await fetch("http://localhost:3000/users", {headers: {'Authorization': 'Bearer '+this.props.token}})
-        data=data.json()
+        data=await data.json()
         this.setState({data: data})
     }
 
