@@ -1,21 +1,24 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+ } from 'react-router-dom';
 
 import './App.css';
 import './pages/login/login.page'
 import Login from './pages/login/login.page';
-import Signup from './pages/signup/signup.page'
+import SignUp from './pages/signup/signup.page';
+import UsersPage from './pages/users/users.page'
 
 class  App extends React.Component {
   constructor(props){
     super(props);
-    this.handleLogInButton = this.handleLogInButton.bind(this);
-    this.handleLogOutButton = this.handleLogOutButton.bind(this);
-    this.handleSignUpButton = this.handleSignUpButton.bind(this);
     this.setToken = this.setToken.bind(this);
+    this.clearMassage = this.clearMassage.bind(this)
+    this.setMassage = this.setMassage.bind(this)
     this.state = {
-      isLoginPage: true,
-      isRegisterPage: false,
-      isUsersPage: false,
+      massage: "",
       token: ''
     }
   }
@@ -23,60 +26,43 @@ class  App extends React.Component {
   setToken(token){
     console.log(token)
     this.setState({token: token});
+    // console.log(this.state)
   }
 
-  handleLogInButton(){
-    this.setState({
-      isLoginPage: true,
-      isRegisterPage: false,
-      isUsersPage: false
-    })
+  setMassage(massage){
+    this.setState({massage: massage});
   }
 
-  handleSignUpButton(){
-    this.setState({
-      isLoginPage: false,
-      isRegisterPage: true,
-      isUsersPage: false
-    })
-  }
-  handleLogOutButton(){
-    this.setState({
-      isLoginPage: true,
-      isRegisterPage: false,
-      isUsersPage: false,
-      token: null
-    })
+
+
+  clearMassage(){
+    setTimeout(()=>{ this.setState({massage: ""}) }, 5000);
   }
 
   render(){
 
-    let isLoginPage= this.state.isLoginPage;
-    let isRegisterPage = this.state.isRegisterPage;
-    let isUsersPage = this.state.isUsersPage;
+    this.clearMassage()
     return(
-      <div>
-        { isLoginPage &&
-        <button onClick={this.handleSignUpButton}>
-          SignUp
-        </button>
-      }
-      {isRegisterPage &&
-      <button onClick={this.handleLogInButton}>
-        LogIn
-      </button>
-      }{isUsersPage &&
-        <button onClick={this.handleLogOutButton}>
-          LogOut
-        </button>
-      }{isLoginPage &&
-        <Login setToken={this.setToken}></Login>
-      }{isRegisterPage &&
-        <div><Signup></Signup></div>
-      }{isUsersPage &&
-        <div>Users Page</div>
-      }
-      </div>
+      <Router>
+        {this.state.massage !== "" &&
+          <h1>{this.state.massage}</h1>
+        }
+        <Switch>
+        <Route exact path="/">
+            <Login token={this.state.token} setMassage={this.setMassage} setToken={this.setToken}></Login>
+          </Route>
+          <Route exact path="/login">
+            <Login setMassage={this.setMassage} setToken={this.setToken}></Login>
+          </Route>
+          <Route exact path="/signup">
+            <SignUp setMassage={this.setMassage}></SignUp>
+          </Route>
+          <Route exact path="/users">
+            <UsersPage token={this.state.token}></UsersPage>
+          </Route>
+        </Switch>
+
+      </Router>
     )
       
   }
