@@ -48,7 +48,7 @@ class Login extends React.Component {
                 // Examine the text in the response
                 response.json().then(data => {
                     console.log(data);
-                    this.props.setToken(data.token)
+                    // this.props.setToken(data.token)
                 });
                 }
             )
