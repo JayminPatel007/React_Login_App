@@ -10,7 +10,7 @@ class Signup extends React.Component {
             email:"",
             name:'',
             gender:'male',
-            birthdate:'',
+            birthdate: new Date(),
             address: '',
             password: '',
             err:""
@@ -70,8 +70,8 @@ class Signup extends React.Component {
     render(){
         return (
             <div>
-                <Link to="/login">Log In</Link>
-                <form>
+                <h1 className="title">SignUp</h1>
+                <form className="form">
                     <label>Email</label>
                     <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email}/>
                     <br></br>
@@ -94,8 +94,9 @@ class Signup extends React.Component {
                     <label>Password</label>
                     <input type="password" name="password" onChange={this.handleInputChange} value={this.state.password}/>
                     <br></br>
-                    <input type="submit" onClick={this.handleSubmit}/>
+                    <input className="submitButton" type="submit" onClick={this.handleSubmit} value="SignUp"/>
                 </form>
+                <div className="link">Already have an Account, <Link to="/login">Log In</Link></div>
             </div>
         )
     }

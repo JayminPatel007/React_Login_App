@@ -1,4 +1,5 @@
 import React from 'react';
+import './users.style.css'
 
 import UserDetail from '../../components/userdetail/userdetail.component'
 import { Redirect } from 'react-router-dom';
@@ -48,15 +49,15 @@ class UsersPage extends React.Component{
         console.log("token is", this.props.token)
         console.log(this.props.token ==="")
         if (this.props.token ==="") {
-            console.log("Reached here!")
+            this.props.setMassage("Please Login to view this page")
             return <Redirect to="/login"></Redirect>
         }
         else{
             return(
                 <div> 
-                    <button onClick={this.props.logOut}>Logout</button>
+                    <button className="logout" onClick={this.props.logOut}>Logout</button>
                     {data !==null &&
-                        <table>
+                        <table className="users-page">
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
@@ -65,7 +66,7 @@ class UsersPage extends React.Component{
                                 <th>Address</th>
                             </tr>
                             {data.map(user=>{
-                                return (<UserDetail user={user} ></UserDetail>)
+                                return (<UserDetail key="user.email" user={user} ></UserDetail>)
                             })}
                         </table> 
                     }

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link, Redirect} from 'react-router-dom';
+import "./login.style.css"
 
 class Login extends React.Component {
     constructor(props){
@@ -67,16 +68,17 @@ class Login extends React.Component {
                 {this.state.isLoggedin &&
                     <Redirect to="/users"></Redirect>
                 }
-                <Link to="/signup">Sign Up</Link>
-                <form>
+                <h1 className="title">Login</h1>
+                <form className="form">                   
                     <label>Email</label>
                     <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email}/>
                     <br />
                     <label>Password</label>
                     <input type="password" name="password" onChange={this.handleInputChange} value={this.state.password}/>
                     <br />
-                    <input type="submit" onClick={this.handleSubmit}/>
+                    <input className="submitButton" type="submit" onClick={this.handleSubmit} value="LogIn"/>
                 </form>
+                <div className="link">Don't have an account, <Link to="/signup">Sign Up</Link></div>
             </div>
         )
     }

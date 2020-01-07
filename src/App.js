@@ -15,7 +15,6 @@ class  App extends React.Component {
   constructor(props){
     super(props);
     this.setToken = this.setToken.bind(this);
-    this.clearMassage = this.clearMassage.bind(this);
     this.setMassage = this.setMassage.bind(this);
     this.logOut = this.logOut.bind(this);
     this.state = {
@@ -43,8 +42,9 @@ class  App extends React.Component {
     // console.log(this.state)
   }
 
-  setMassage(massage){
-    this.setState({massage: massage});
+  async setMassage(massage){
+    await this.setState({massage: massage});
+    setTimeout(()=>{ this.setState({massage: ""}) }, 4000);
   }
 
   async logOut(){
@@ -52,20 +52,16 @@ class  App extends React.Component {
     await this.setState({token: ""});
     document.cookie = `token=`;
     console.log(this.state)
-  }
-
-  clearMassage(){
-    setTimeout(()=>{ this.setState({massage: ""}) }, 10000);
+    this.setMassage("Logged Out")
   }
 
   render(){
     console.log("render: App Component")
 
-    this.clearMassage()
     return(
       <Router>
         {this.state.massage !== "" &&
-          <h1>{this.state.massage}</h1>
+          <div class="massage">{this.state.massage}</div>
         }
         <Switch>
         <Route exact path="/">
@@ -78,7 +74,7 @@ class  App extends React.Component {
             <SignUp setMassage={this.setMassage}></SignUp>
           </Route>
           <Route exact path="/users">
-            <UsersPage token={this.state.token} logOut={this.logOut}></UsersPage>
+            <UsersPage setMassage={this.setMassage}  token={this.state.token} logOut={this.logOut}></UsersPage>
           </Route>
         </Switch>
 
