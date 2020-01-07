@@ -13,18 +13,76 @@ class Signup extends React.Component {
             birthdate: new Date(),
             address: '',
             password: '',
-            err:""
+            password2: '',
+            err:"",
+            emailError: '',
+            passwordError: '',
+            password2Error: '',
+            nameError: ''
         }
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
+        this.ValidateEmail = this.ValidateEmail.bind(this)
     }
     async handleInputChange(event){
         const target = event.target;
         await this.setState({[target.name]:target.value})
     }
 
+    ValidateEmail(mail) {
+        if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(mail))
+        {
+            return (true)
+        }
+            return (false)
+    }
+
+    validate(){
+        let emailError= "";
+        let nameError="";
+        let passwordError= "";
+        let password2Error= "";
+        if (!this.ValidateEmail(this.state.email)){
+            emailError = "Email is not valid"
+        }else{
+            this.setState({emailError: ""});
+        }
+        if (this.state.name === ""){
+            nameError = "Name field should not be empty"
+        }else{
+            this.setState({nameError: ""})
+        }
+        if (this.state.password === ""){
+            passwordError = "Password field shold not be Empty"
+        }else{
+            this.setState({passwordError: ""})
+        }if(this.state.password2 !== this.state.password){
+            password2Error = "Passwords do not match"
+        }else{
+            this.setState({password2Error: ""})
+        }if(emailError){
+            this.setState({emailError: emailError})
+            return false
+        }if(nameError){
+            this.setState({nameError: nameError})
+            return false
+        }
+        if(passwordError){
+            this.setState({passwordError: passwordError});
+            return false
+        }if(password2Error){
+            this.setState({password2Error: password2Error});
+            return false
+        }
+        return true
+    }
+
     handleSubmit(event){
         event.preventDefault();
+        const isValid = this.validate()
+        if (!isValid){
+            return
+        }
         const data = this.state;
         const user =  {
             email : data.email,
@@ -32,7 +90,7 @@ class Signup extends React.Component {
             gender: data.gender,
             birthDate: data.birthdate,
             address: data.address,
-            password: data.password
+            password: data.password,
         }
         const options = {
             method: "post",
@@ -74,9 +132,11 @@ class Signup extends React.Component {
                 <form className="form">
                     <label>Email</label>
                     <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email}/>
+                    { this.state.emailError ? <div className="error">{this.state.emailError}</div> : null}
                     <br></br>
                     <label>Name</label>
                     <input type="text" name="name" onChange={this.handleInputChange} value={this.state.name}/>
+                    { this.state.nameError ? <div className="error">{this.state.nameError}</div> : null}
                     <br></br>
                     <label>Gender</label>
                     <select name="gender" onChange={this.handleInputChange} value={this.state.gender}>
@@ -93,6 +153,11 @@ class Signup extends React.Component {
                     <br></br>
                     <label>Password</label>
                     <input type="password" name="password" onChange={this.handleInputChange} value={this.state.password}/>
+                    { this.state.passwordError ? <div className="error">{this.state.passwordError}</div> : null}
+                    <br></br>
+                    <label>Confitm Password</label>
+                    <input type="password" name="password2" onChange={this.handleInputChange} value={this.state.password2}/>
+                    { this.state.password2Error ? <div className="error">{this.state.password2Error}</div> : null}
                     <br></br>
                     <input className="submitButton" type="submit" onClick={this.handleSubmit} value="SignUp"/>
                 </form>

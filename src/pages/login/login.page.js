@@ -9,23 +9,60 @@ class Login extends React.Component {
             isLoggedin: false,
             email: '',
             password: '',
-            error: ''
+            error: '',
+            emailError: "",
+            passwordError: ""
         }
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
+        this.ValidateEmail = this.ValidateEmail.bind(this)
     }
 
     async handleInputChange(event){
         const target = event.target;
         await this.setState({[target.name]:target.value})
     }
-    componentWillMount(){
-        console.log("Component will mount Login Page")
-        console.log(this.props.token)
+
+    ValidateEmail(mail) {
+        if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(mail))
+        {
+            return (true)
+        }
+            return (false)
+    }
+
+    validate(){
+        let emailError = "";
+        let passwordError = "";
+        if (!this.ValidateEmail(this.state.email)){
+            emailError="Email is not Valid"
+        } else{
+            this.setState({emailError: ""})
+        }
+        if (this.state.password === ""){
+            passwordError = "Password field is Empty"
+        } else{
+            this.setState({passwordError: ""})
+        }
+        if (emailError){
+            this.setState({emailError: emailError});
+            return false
+        }
+        
+        if (passwordError){
+            this.setState({passwordError: passwordError});
+            return false;
+        }
+        return true;
+
     }
 
     handleSubmit(event){
         event.preventDefault();
+        const isValid = this.validate()
+        if (!isValid){
+            return
+        }
         const data = this.state;
         this.props.setToken(this.state.password)
         console.log(data)
@@ -71,10 +108,12 @@ class Login extends React.Component {
                 <h1 className="title">Login</h1>
                 <form className="form">                   
                     <label>Email</label>
-                    <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email}/>
+                    <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email} required/>
+                    { this.state.emailError ? <div className="error">{this.state.emailError}</div> : null}
                     <br />
                     <label>Password</label>
-                    <input type="password" name="password" onChange={this.handleInputChange} value={this.state.password}/>
+                    <input type="password" name="password" onChange={this.handleInputChange} value={this.state.password} />
+                    { this.state.passwordError ? <div className="error">{this.state.passwordError}</div> : null}
                     <br />
                     <input className="submitButton" type="submit" onClick={this.handleSubmit} value="LogIn"/>
                 </form>

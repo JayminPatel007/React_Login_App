@@ -76,6 +76,9 @@ class  App extends React.Component {
           <Route exact path="/users">
             <UsersPage setMassage={this.setMassage}  token={this.state.token} logOut={this.logOut}></UsersPage>
           </Route>
+          <Route path="/">
+            <h1>Not Found</h1>
+          </Route>
         </Switch>
 
       </Router>

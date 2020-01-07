@@ -9,10 +9,17 @@
 }
 
 .submitButton {
-    margin-top: 10px;
+    margin-top: 50px;
+    margin-left: 100px;;
 }
 
 .title{
     margin-top: 40px;
     margin-left: 35%;
+}
+
+.error{
+    color: red;
+    font-size: 12;
+    margin-left: 60px;
 }
