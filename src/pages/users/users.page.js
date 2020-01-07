@@ -1,6 +1,7 @@
 import React from 'react';
 
 import UserDetail from '../../components/userdetail/userdetail.component'
+import { Redirect } from 'react-router-dom';
 
 class UsersPage extends React.Component{
     constructor(props){
@@ -43,32 +44,37 @@ class UsersPage extends React.Component{
     }
 
     render(){
-        let data=this.state.data;
-        console.log(data)
-        
-        return(
-            <div>
-                <h1>Hi</h1>
-                {data===null &&
-                    <h1>Wait</h1>
-                }
-                {data !==null &&
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Birthdate</th>
-                            <th>Gender</th>
-                            <th>Address</th>
-                        </tr>
-                        {data.map(user=>{
-                            return (<UserDetail user={user} ></UserDetail>)
-                        })}
-                    </table>
-                }
-            </div>
-        )
+        const data = this.state.data;
+        console.log("token is", this.props.token)
+        console.log(this.props.token ==="")
+        if (this.props.token ==="") {
+            console.log("Reached here!")
+            return <Redirect to="/login"></Redirect>
+        }
+        else{
+            return(
+                <div> 
+                    <button onClick={this.props.logOut}>Logout</button>
+                    {data !==null &&
+                        <table>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Birthdate</th>
+                                <th>Gender</th>
+                                <th>Address</th>
+                            </tr>
+                            {data.map(user=>{
+                                return (<UserDetail user={user} ></UserDetail>)
+                            })}
+                        </table> 
+                    }
+                    
+                </div>
+            )
+        }
     }
+        
 }
 
 export default UsersPage;

@@ -58,7 +58,7 @@ class Signup extends React.Component {
                     // console.log(data);
                     // console.log(this.props);
                     this.props.setMassage("User created!")
-                    return <Redirect to="/login"></Redirect>
+                    console.log("User Created!")
                 });
                 }
             )
@@ -70,7 +70,7 @@ class Signup extends React.Component {
     render(){
         return (
             <div>
-                <Link to="/signup">Sign Up</Link>
+                <Link to="/login">Log In</Link>
                 <form>
                     <label>Email</label>
                     <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email}/>

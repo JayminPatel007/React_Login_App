@@ -15,17 +15,31 @@ class  App extends React.Component {
   constructor(props){
     super(props);
     this.setToken = this.setToken.bind(this);
-    this.clearMassage = this.clearMassage.bind(this)
-    this.setMassage = this.setMassage.bind(this)
+    this.clearMassage = this.clearMassage.bind(this);
+    this.setMassage = this.setMassage.bind(this);
+    this.logOut = this.logOut.bind(this);
     this.state = {
       massage: "",
       token: ''
     }
   }
 
-  setToken(token){
+  componentWillMount(){
+    try{
+      const allCookies = document.cookie;
+      if (allCookies !== ""){
+        const tokent = allCookies.split("=")[1]
+        this.setState({token: tokent})
+      }
+    }catch{
+      this.setState({token: ""})
+    }
+  }
+
+  async setToken(token){
     console.log(token)
-    this.setState({token: token});
+    await this.setState({token: token});
+    document.cookie = `token=${token}`
     // console.log(this.state)
   }
 
@@ -33,13 +47,19 @@ class  App extends React.Component {
     this.setState({massage: massage});
   }
 
-
+  async logOut(){
+    console.log("Log Out Button Clicked!")
+    await this.setState({token: ""});
+    document.cookie = `token=`;
+    console.log(this.state)
+  }
 
   clearMassage(){
-    setTimeout(()=>{ this.setState({massage: ""}) }, 5000);
+    setTimeout(()=>{ this.setState({massage: ""}) }, 10000);
   }
 
   render(){
+    console.log("render: App Component")
 
     this.clearMassage()
     return(
@@ -52,13 +72,13 @@ class  App extends React.Component {
             <Login token={this.state.token} setMassage={this.setMassage} setToken={this.setToken}></Login>
           </Route>
           <Route exact path="/login">
-            <Login setMassage={this.setMassage} setToken={this.setToken}></Login>
+            <Login setMassage={this.setMassage} setToken={this.setToken} token={this.state.token}></Login>
           </Route>
           <Route exact path="/signup">
             <SignUp setMassage={this.setMassage}></SignUp>
           </Route>
           <Route exact path="/users">
-            <UsersPage token={this.state.token}></UsersPage>
+            <UsersPage token={this.state.token} logOut={this.logOut}></UsersPage>
           </Route>
         </Switch>
 

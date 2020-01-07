@@ -5,6 +5,7 @@ class Login extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            isLoggedin: false,
             email: '',
             password: '',
             error: ''
@@ -16,6 +17,10 @@ class Login extends React.Component {
     async handleInputChange(event){
         const target = event.target;
         await this.setState({[target.name]:target.value})
+    }
+    componentWillMount(){
+        console.log("Component will mount Login Page")
+        console.log(this.props.token)
     }
 
     handleSubmit(event){
@@ -45,10 +50,10 @@ class Login extends React.Component {
                     })
                 }
 
-                // Examine the text in the response
                 response.json().then(data => {
                     console.log(data);
-                    // this.props.setToken(data.token)
+                    this.props.setToken(data.token)
+                    this.setState({isLoggedin: true})
                 });
                 }
             )
@@ -59,7 +64,7 @@ class Login extends React.Component {
     render(){
         return (
             <div>
-                {this.props.token !== "" &&
+                {this.state.isLoggedin &&
                     <Redirect to="/users"></Redirect>
                 }
                 <Link to="/signup">Sign Up</Link>
