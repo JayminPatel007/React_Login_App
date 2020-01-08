@@ -13,11 +13,11 @@ class UsersPage extends React.Component{
             currentPage: 0,
             totalPages: 0,
             searchQuery: "",
-            queryData: []
         }
         this.nextPage = this.nextPage.bind(this);
         this.previousPage = this.previousPage.bind(this)
         this.handleChange = this.handleChange.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
     }
 
     componentDidMount(){
@@ -63,8 +63,7 @@ class UsersPage extends React.Component{
             }
         }
         const nextPage=this.state.currentPage+1
-        console.log('http://localhost:8000/users?page='+nextPage)
-        fetch('http://localhost:8000/users?page='+nextPage, options)
+        fetch('http://localhost:8000/users?page='+nextPage+'&query='+this.state.searchQuery, options)
             .then(
                 response => {
                 if (response.status !== 200) {
@@ -97,7 +96,7 @@ class UsersPage extends React.Component{
         }
         const prevPage=this.state.currentPage-1
         console.log('http://localhost:8000/users?page='+prevPage)
-        fetch('http://localhost:8000/users?page='+prevPage, options)
+        fetch('http://localhost:8000/users?page='+prevPage+'&query='+this.state.searchQuery, options)
             .then(
                 response => {
                 if (response.status !== 200) {
@@ -122,26 +121,45 @@ class UsersPage extends React.Component{
         event.preventDefault();
         const target = event.target;
         await this.setState({searchQuery: target.value})
-        let data = [];
-        for (let user of this.state.data){
-            if(user.name.toLowerCase().search(this.state.searchQuery.toLowerCase())!==-1){
-                data.push(user)
-            }
-            
-        }
-        this.setState({queryData: data})
+    }
 
+    handleSubmit(event){
+        event.preventDefault()
+        console.log("compount did mount")
+        console.log(this.props.token)
+        const options = {
+            method: "get",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer "+this.props.token
+            }
+        }
+        fetch('http://localhost:8000/users?page=1&query='+this.state.searchQuery, options)
+            .then(
+                response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                    response.status);
+                    console.log(this.props);
+                }
+
+                // Examine the text in the response
+                response.json().then(data => {
+                    console.log(data)
+                    this.setState({data: data.docs, currentPage:1, totalPages: data.pages})
+                });
+                }
+            )
+            .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+            });
     }
 
 
     render(){
+        console.log(this.state)
         let data = this.state.data;
-        console.log()
-        if(this.state.searchQuery){
-            data = this.state.queryData;
-        } else{
-            data = this.state.data
-        }
         console.log(this.props.token ==="")
         if (this.props.token ==="") {
             this.props.setMassage("Please Login to view this page")
@@ -155,6 +173,7 @@ class UsersPage extends React.Component{
                         <div>
                         <form className="search">
                             <input classNmae=" form-control" onChange={this.handleChange} value={this.state.searchQuery} placeholder="Search"/>
+                            <input type="submit" onClick={this.handleSubmit}></input>
                         </form>
                         <table className="users-page">
                             <tr>
@@ -170,7 +189,7 @@ class UsersPage extends React.Component{
                             })}
                             <tr>
                                 <td>
-                            {(this.state.currentPage>1 && !this.state.searchQuery) &&
+                            {this.state.currentPage>1 &&
                                 <button className="previous" onClick={this.previousPage}>Previous</button>
                             }
                             </td>
@@ -179,7 +198,7 @@ class UsersPage extends React.Component{
                             <td></td>
                             <td></td>
                             <td>
-                            {(this.state.currentPage<this.state.totalPages && !this.state.searchQuery) &&
+                            {this.state.currentPage<this.state.totalPages &&
                                 <button className="next" onClick={this.nextPage}>Next</button>
                             }
                             </td>
