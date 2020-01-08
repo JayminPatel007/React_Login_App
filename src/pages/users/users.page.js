@@ -1,15 +1,23 @@
 import React from 'react';
+import { Redirect} from 'react-router-dom';
+
 import './users.style.css'
 
 import UserDetail from '../../components/userdetail/userdetail.component'
-import { Redirect } from 'react-router-dom';
 
 class UsersPage extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            data: null
+            data: null,
+            currentPage: 0,
+            totalPages: 0,
+            searchQuery: "",
+            queryData: []
         }
+        this.nextPage = this.nextPage.bind(this);
+        this.previousPage = this.previousPage.bind(this)
+        this.handleChange = this.handleChange.bind(this)
     }
 
     componentDidMount(){
@@ -23,7 +31,7 @@ class UsersPage extends React.Component{
                 "Authorization": "Bearer "+this.props.token
             }
         }
-        fetch('http://localhost:8000/users', options)
+        fetch('http://localhost:8000/users?page=1', options)
             .then(
                 response => {
                 if (response.status !== 200) {
@@ -35,7 +43,7 @@ class UsersPage extends React.Component{
                 // Examine the text in the response
                 response.json().then(data => {
                     console.log(data)
-                    this.setState({data: data})
+                    this.setState({data: data.docs, currentPage:1, totalPages: data.pages})
                 });
                 }
             )
@@ -44,9 +52,96 @@ class UsersPage extends React.Component{
             });
     }
 
+    async nextPage(event){
+        event.preventDefault();
+        const options = {
+            method: "get",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer "+this.props.token
+            }
+        }
+        const nextPage=this.state.currentPage+1
+        console.log('http://localhost:8000/users?page='+nextPage)
+        fetch('http://localhost:8000/users?page='+nextPage, options)
+            .then(
+                response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                    response.status);
+                    console.log(this.props);
+                }
+
+                // Examine the text in the response
+                response.json().then(data => {
+                    console.log(data)
+                    this.setState({data: data.docs, currentPage:nextPage})
+                });
+                }
+            )
+            .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+            });
+    }
+
+    async previousPage(event){
+        event.preventDefault();
+        const options = {
+            method: "get",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer "+this.props.token
+            }
+        }
+        const prevPage=this.state.currentPage-1
+        console.log('http://localhost:8000/users?page='+prevPage)
+        fetch('http://localhost:8000/users?page='+prevPage, options)
+            .then(
+                response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                    response.status);
+                    console.log(this.props);
+                }
+
+                // Examine the text in the response
+                response.json().then(data => {
+                    console.log(data)
+                    this.setState({data: data.docs, currentPage:prevPage})
+                });
+                }
+            )
+            .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+            });
+    }
+
+    async handleChange(event){
+        event.preventDefault();
+        const target = event.target;
+        await this.setState({searchQuery: target.value})
+        let data = [];
+        for (let user of this.state.data){
+            if(user.name.toLowerCase().search(this.state.searchQuery.toLowerCase())!==-1){
+                data.push(user)
+            }
+            
+        }
+        this.setState({queryData: data})
+
+    }
+
+
     render(){
-        const data = this.state.data;
-        console.log("token is", this.props.token)
+        let data = this.state.data;
+        console.log()
+        if(this.state.searchQuery){
+            data = this.state.queryData;
+        } else{
+            data = this.state.data
+        }
         console.log(this.props.token ==="")
         if (this.props.token ==="") {
             this.props.setMassage("Please Login to view this page")
@@ -54,24 +149,48 @@ class UsersPage extends React.Component{
         }
         else{
             return(
-                <div> 
+                    <div> 
                     <button className="logout" onClick={this.props.logOut}>Logout</button>
                     {data !==null &&
+                        <div>
+                        <form className="search">
+                            <input classNmae=" form-control" onChange={this.handleChange} value={this.state.searchQuery} placeholder="Search"/>
+                        </form>
                         <table className="users-page">
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Birthdate</th>
-                                <th>Gender</th>
-                                <th>Address</th>
+                                <th className="name">Name</th>
+                                <th className="email">Email</th>
+                                <th className="birthdate">Birthdate</th>
+                                <th className="gender">Gender</th>
+                                <th className="address">Address</th>
+                                <th className="actions">Actions</th>
                             </tr>
                             {data.map(user=>{
-                                return (<UserDetail key="user.email" user={user} ></UserDetail>)
+                                return (<UserDetail setMassage={this.props.setMassage} token={this.props.token} key={user.email} user={user} ></UserDetail>)
                             })}
+                            <tr>
+                                <td>
+                            {(this.state.currentPage>1 && !this.state.searchQuery) &&
+                                <button className="previous" onClick={this.previousPage}>Previous</button>
+                            }
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                            {(this.state.currentPage<this.state.totalPages && !this.state.searchQuery) &&
+                                <button className="next" onClick={this.nextPage}>Next</button>
+                            }
+                            </td>
+                            </tr>
                         </table> 
+                        </div>
                     }
                     
-                </div>
+                    
+                    </div>
+
             )
         }
     }

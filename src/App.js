@@ -10,6 +10,7 @@ import './pages/login/login.page'
 import Login from './pages/login/login.page';
 import SignUp from './pages/signup/signup.page';
 import UsersPage from './pages/users/users.page'
+import EditUser from "./pages/editUser/editUser.page"
 
 class  App extends React.Component {
   constructor(props){
@@ -75,6 +76,10 @@ class  App extends React.Component {
           </Route>
           <Route exact path="/users">
             <UsersPage setMassage={this.setMassage}  token={this.state.token} logOut={this.logOut}></UsersPage>
+          </Route>
+
+          <Route path="/users/edit/:id">
+              <EditUser token={this.state.token} setMassage={this.setMassage}></EditUser>
           </Route>
           <Route path="/">
             <h1>Not Found</h1>

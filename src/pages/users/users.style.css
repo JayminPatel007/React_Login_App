@@ -4,6 +4,51 @@
 }
 
 .logout{
-    margin-top: 5%;
+    margin-top: 2.5%;
+    margin-left: 20%;
+}
+
+.next{
+    margin-top: 30px;
+    float: right;
+}
+
+.previous{
+    margin-top: 30px;
+    float: left;
+}
+.name{
+    width: 150px;
+    max-width: 150px;
+}
+
+.email{
+    width: 200px;
+    max-width: 200px;
+}
+
+.birthdate{
+    width: 300px;
+    max-width: 300px;
+}
+
+.gender{
+    width: 60px;
+    max-width: 60px;
+}
+
+.address{
+    width: 70px;
+    max-width: 70px;
+}
+
+.actions{
+    width: 150px;
+    max-width: 150px;
+}
+
+.search{
+    margin-top: 30px;
+    margin-bottom: 30px;
     margin-left: 20%;
 }

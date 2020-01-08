@@ -1,27 +1,25 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+import React, { Component } from 'react'
+import {Redirect, withRouter, Link} from "react-router-dom"
 
-
-class Signup extends React.Component {
+class EditUser extends Component {
     constructor(props){
-        super(props);
-        console.log(props);
+        super(props)
         this.state = {
+            _id: "",
             email:"",
             name:'',
             gender:'male',
             birthDate: new Date(),
             address: '',
             password: '',
-            password2: '',
             err:"",
-            emailError: '',
             passwordError: '',
-            password2Error: '',
-            nameError: ''
+            nameError: '',
+            editcomplete: false
         }
         this.handleInputChange = this.handleInputChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
+        this.validate = this.validate.bind(this)
         this.ValidateEmail = this.ValidateEmail.bind(this)
     }
     async handleInputChange(event){
@@ -41,7 +39,6 @@ class Signup extends React.Component {
         let emailError= "";
         let nameError="";
         let passwordError= "";
-        let password2Error= "";
         if (!this.ValidateEmail(this.state.email)){
             emailError = "Email is not valid"
         }else{
@@ -56,10 +53,6 @@ class Signup extends React.Component {
             passwordError = "Password field shold not be Empty"
         }else{
             this.setState({passwordError: ""})
-        }if(this.state.password2 !== this.state.password){
-            password2Error = "Passwords do not match"
-        }else{
-            this.setState({password2Error: ""})
         }if(emailError){
             this.setState({emailError: emailError})
             return false
@@ -70,15 +63,13 @@ class Signup extends React.Component {
         if(passwordError){
             this.setState({passwordError: passwordError});
             return false
-        }if(password2Error){
-            this.setState({password2Error: password2Error});
-            return false
         }
         return true
     }
 
     handleSubmit(event){
         event.preventDefault();
+        console.log("Handle Submit is called")
         const isValid = this.validate()
         if (!isValid){
             return
@@ -93,17 +84,19 @@ class Signup extends React.Component {
             password: data.password,
         }
         const options = {
-            method: "post",
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "application/json",
+                "Authorization": "Bearer "+this.props.token
             }, 
             body: JSON.stringify(user)
         }
-        fetch('http://localhost:8000/signup', options)
+        fetch('http://localhost:8000/users/'+this.state._id, options)
             .then(
                 response => {
-                if (response.status !== 201) {
+                    console.log("Logged in then")
+                if (response.status !== 200) {
                     console.log('Looks like there was a problem. Status Code: ' +
                     response.status);
                     return response.json().then(errdata=>{
@@ -115,8 +108,40 @@ class Signup extends React.Component {
                 response.json().then(data => {
                     // console.log(data);
                     // console.log(this.props);
-                    this.props.setMassage("User created!")
-                    console.log("User Created!")
+                    this.props.setMassage("User edited!")
+                    this.setState({editcomplete: true})
+                    console.log("User Edited!")
+                });
+                }
+            )
+            .catch(function(err) {
+                console.log("Logged in catch")
+                console.log('Fetch Error :-S', err);
+            });
+    }
+
+    componentDidMount(){
+        let id= this.props.match.params.id;
+        console.log(this.props.token)
+        const options = {
+            method: "get",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer "+this.props.token
+            }
+        }
+        fetch('http://localhost:8000/users/'+id, options)
+            .then(
+                response => {
+                if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                    response.status);
+                }
+
+                // Examine the text in the response
+                response.json().then(data => {
+                    this.setState(data)
                 });
                 }
             )
@@ -124,14 +149,17 @@ class Signup extends React.Component {
                 console.log('Fetch Error :-S', err);
             });
     }
-
-    render(){
+    render() {
+        console.log(this.state);
+        if (this.state.editcomplete){
+            return <Redirect to="/users"></Redirect>
+        }
         return (
             <div>
-                <h1 className="title">SignUp</h1>
+                <h1 className="title">Edit User</h1>
                 <form className="form">
                     <label>Email</label>
-                    <input type="email" name="email" onChange={this.handleInputChange} value={this.state.email}/>
+                    <input id="disabledInput"  type="email" name="email" value={this.state.email} disabled/>
                     { this.state.emailError ? <div className="error">{this.state.emailError}</div> : null}
                     <br></br>
                     <label>Name</label>
@@ -146,7 +174,7 @@ class Signup extends React.Component {
                     </select>
                     <br></br>
                     <label >BirthDate</label>
-                    <input type="date" name="birthDate" onChange={this.handleInputChange} value={this.state.birthDate}/>
+                    <input type="date" name="birthDate" onChange={event => this.setState({birthDate: event.target.value})} value={this.state.birthDate}/>
                     <br></br>
                     <label>Address</label>
                     <textarea name="address" onChange={this.handleInputChange} value={this.state.address}></textarea>
@@ -155,16 +183,14 @@ class Signup extends React.Component {
                     <input type="password" name="password" onChange={this.handleInputChange} value={this.state.password}/>
                     { this.state.passwordError ? <div className="error">{this.state.passwordError}</div> : null}
                     <br></br>
-                    <label>Confitm Password</label>
-                    <input type="password" name="password2" onChange={this.handleInputChange} value={this.state.password2}/>
-                    { this.state.password2Error ? <div className="error">{this.state.password2Error}</div> : null}
-                    <br></br>
-                    <input className="submitButton" type="submit" onClick={this.handleSubmit} value="SignUp"/>
+                    <input className="submitButton" onClick={this.handleSubmit} type="submit" value="Edit"/>
                 </form>
-                <div className="link">Already have an Account, <Link to="/login">Log In</Link></div>
+                <div className="link">Don't want to change? <Link to="/users">Go back</Link></div>
+
             </div>
         )
     }
 }
 
-export default Signup;
+export default withRouter(EditUser);
+
